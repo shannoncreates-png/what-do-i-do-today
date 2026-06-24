@@ -79,17 +79,16 @@ export function SwipeScreen({ swipeState, onUpdate, onSelect, onShowGrid, showGr
     return <GridModal items={liked} onClose={onCloseGrid} title="Liked so far" />;
   }
 
-  const phase = swipeCount < 10 ? 1 : swipeCount < 20 ? 2 : 3;
+  const isFirstFew = swipeCount < 3;
 
   return (
-    // h-dvh prevents scroll; overflow-hidden clips ghost cards
-    <div
-      className="flex flex-col overflow-hidden"
-      style={{ height: "100dvh", background: "#f7f5ff" }}
-    >
-      {/* Header — compact */}
-      <div className="flex items-center justify-between px-5 pt-4 pb-2 max-w-[440px] mx-auto w-full flex-shrink-0">
-        <span style={{ fontSize: 12, color: "#a0a0c0", fontWeight: 500 }}>{swipeCount} swipes · phase {phase}</span>
+    <div style={{ minHeight: "100dvh", background: "#f7f5ff", display: "flex", flexDirection: "column" }}>
+
+      {/* Header */}
+      <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "16px 20px 8px", maxWidth: 440, margin: "0 auto", width: "100%" }}>
+        <span style={{ fontSize: 12, color: "#a0a0c0", fontWeight: 500 }}>
+          {swipeCount === 0 ? "Swipe to start learning your vibe" : `${swipeCount} swiped · ${liked.length} maybe`}
+        </span>
         <button
           onClick={onShowGrid}
           style={{
@@ -101,32 +100,51 @@ export function SwipeScreen({ swipeState, onUpdate, onSelect, onShowGrid, showGr
             fontSize: 13,
             cursor: "pointer",
             fontWeight: 600,
-            transition: "all 0.15s",
           }}
         >
           ❤️ {liked.length}
         </button>
       </div>
 
-      {/* Card area — flex-1 centers the card */}
-      <div className="flex-1 flex items-center justify-center px-5 min-h-0">
+      {/* Swipe hint — shown for the first few cards */}
+      {isFirstFew && (
+        <div style={{ maxWidth: 440, margin: "0 auto", padding: "0 20px 6px", width: "100%" }}>
+          <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", background: "white", borderRadius: 12, padding: "10px 14px", border: "1px solid #e9d5ff", fontSize: 12 }}>
+            <span style={{ color: "#ef4444", fontWeight: 600 }}>← Nope</span>
+            <span style={{ color: "#6b7280" }}>swipe or tap the buttons</span>
+            <span style={{ color: "#10b981", fontWeight: 600 }}>Maybe →</span>
+          </div>
+        </div>
+      )}
+
+      {/* Card area */}
+      <div style={{ flex: 1, display: "flex", alignItems: "center", justifyContent: "center", padding: "12px 20px 8px" }}>
         {current ? (
           <SwipeCard activity={current} onSwipe={handleSwipe} nextCards={nextCards} />
         ) : (
-          <div className="text-center" style={{ color: "#9ca3af" }}>
-            <div className="text-5xl mb-3">🎉</div>
+          <div style={{ textAlign: "center", color: "#9ca3af" }}>
+            <div style={{ fontSize: 48, marginBottom: 12 }}>🎉</div>
             <p>You&apos;ve seen everything!</p>
           </div>
         )}
       </div>
 
-      {/* Action buttons — fixed at bottom, no scroll needed */}
-      <div className="flex-shrink-0 px-5 pb-6 pt-3 max-w-[440px] mx-auto w-full">
-        <div className="flex gap-3 items-center">
-          {/* Skip */}
+      {/* Action buttons */}
+      <div style={{ padding: "8px 20px 28px", maxWidth: 440, margin: "0 auto", width: "100%" }}>
+        {/* Direction labels */}
+        <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 8, padding: "0 4px" }}>
+          <span style={{ fontSize: 11, color: "#f87171", fontWeight: 600 }}>✕ No thanks</span>
+          <span style={{ fontSize: 11, color: "#6b7280" }}>
+            {liked.length > 0 ? "ready to choose? ↓" : "like a few first ↓"}
+          </span>
+          <span style={{ fontSize: 11, color: "#34d399", fontWeight: 600 }}>Maybe ♥</span>
+        </div>
+
+        <div style={{ display: "flex", gap: 10, alignItems: "center" }}>
+          {/* Skip / No */}
           <button
             onClick={() => handleSwipe("left")}
-            title="Skip"
+            title="Nope"
             style={{
               width: 52,
               height: 52,
@@ -134,43 +152,47 @@ export function SwipeScreen({ swipeState, onUpdate, onSelect, onShowGrid, showGr
               background: "white",
               border: "1.5px solid #fca5a5",
               color: "#ef4444",
-              fontSize: 22,
+              fontSize: 20,
               cursor: "pointer",
               display: "flex",
               alignItems: "center",
               justifyContent: "center",
-              boxShadow: "0 2px 8px rgba(239,68,68,0.12)",
+              boxShadow: "0 2px 8px rgba(239,68,68,0.1)",
               flexShrink: 0,
             }}
           >
             ✕
           </button>
 
-          {/* Choose */}
+          {/* Choose button — center, most prominent */}
           <button
             onClick={onSelect}
             disabled={liked.length === 0}
             style={{
               flex: 1,
-              padding: "13px 16px",
+              padding: "14px 12px",
               borderRadius: 16,
               border: "none",
               background: liked.length === 0 ? "#e5e7eb" : "linear-gradient(135deg,#6366f1,#8b5cf6)",
               color: liked.length === 0 ? "#9ca3af" : "white",
               fontSize: 14,
-              fontWeight: 600,
+              fontWeight: 700,
               cursor: liked.length === 0 ? "not-allowed" : "pointer",
               transition: "all 0.15s",
               boxShadow: liked.length > 0 ? "0 4px 16px rgba(99,102,241,0.3)" : "none",
+              lineHeight: 1.3,
+              textAlign: "center",
             }}
           >
-            {liked.length === 0 ? "Like something first" : `Choose from ${liked.length} liked ✨`}
+            {liked.length === 0
+              ? "Swipe right on anything\nyou might like"
+              : `Choose from ${liked.length} maybe${liked.length === 1 ? "" : "s"} ✨`}
           </button>
 
-          {/* Like */}
+          {/* Like / Maybe */}
           <button
             onClick={() => handleSwipe("right")}
-            title="Like"
+            title="Maybe"
             style={{
               width: 52,
               height: 52,
@@ -178,18 +200,27 @@ export function SwipeScreen({ swipeState, onUpdate, onSelect, onShowGrid, showGr
               background: "white",
               border: "1.5px solid #6ee7b7",
               color: "#10b981",
-              fontSize: 22,
+              fontSize: 20,
               cursor: "pointer",
               display: "flex",
               alignItems: "center",
               justifyContent: "center",
-              boxShadow: "0 2px 8px rgba(52,211,153,0.15)",
+              boxShadow: "0 2px 8px rgba(52,211,153,0.12)",
               flexShrink: 0,
             }}
           >
             ♥
           </button>
         </div>
+
+        {/* Algorithm nudge */}
+        <p style={{ textAlign: "center", fontSize: 11, color: "#c4b5fd", marginTop: 10 }}>
+          {swipeCount < 5
+            ? "Keep swiping — the algorithm learns as you go"
+            : swipeCount < 15
+            ? "Getting a feel for your vibe..."
+            : "Dialled in — suggestions are personalised now"}
+        </p>
       </div>
     </div>
   );
