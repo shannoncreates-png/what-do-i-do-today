@@ -4,8 +4,8 @@
   "description": "Swipe through 1,239 activity ideas to find the perfect thing to do today.",
   "start_url": "/",
   "display": "standalone",
-  "background_color": "#0b0818",
-  "theme_color": "#0b0818",
+  "background_color": "#f7f5ff",
+  "theme_color": "#6366f1",
   "orientation": "portrait",
   "icons": [
     {

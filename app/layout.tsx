@@ -40,7 +40,7 @@ export const metadata: Metadata = {
 };
 
 export const viewport: Viewport = {
-  themeColor: "#0b0818",
+  themeColor: "#6366f1",
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
@@ -65,7 +65,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           }}
         />
       </head>
-      <body className="min-h-full flex flex-col bg-[#0b0818] text-[#f0eeff]">
+      <body className="min-h-full flex flex-col bg-[#f7f5ff] text-[#111827]">
           <ServiceWorkerRegistrar />
           {children}
         </body>
