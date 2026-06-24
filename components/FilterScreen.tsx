@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { Chip } from "./Chip";
 import { FilterSection } from "./FilterSection";
+import { InstallBanner } from "./InstallBanner";
 import { ALL_ACTIVITIES } from "@/lib/activities";
 import { CAT_COLOR, CAT_EMOJI, ALL_CATEGORIES } from "@/lib/constants";
 import { buildPool } from "@/lib/algorithm";
@@ -66,6 +67,11 @@ export function FilterScreen({ onStart }: FilterScreenProps) {
           <p style={{ color: "#6b7280", fontSize: 14, lineHeight: 1.6, maxWidth: 300, margin: "0 auto" }}>
             Swipe through 1,239 ideas across 12 categories. The more you swipe, the smarter it gets.
           </p>
+        </div>
+
+        {/* Install banner */}
+        <div className="mb-5">
+          <InstallBanner />
         </div>
 
         {/* Primary CTA */}
