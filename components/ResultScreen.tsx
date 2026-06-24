@@ -22,57 +22,46 @@ export function ResultScreen({ liked, onRestart, onShowGrid, showGrid, onCloseGr
   const catColor = winner ? CAT_COLOR[winner.tags[0]] || "#6366f1" : "#6366f1";
 
   return (
-    <div className="min-h-screen bg-[#0b0818] text-[#f0eeff] flex flex-col">
+    <div style={{ minHeight: "100dvh", background: "#f7f5ff", color: "#111827" }}>
       <div className="max-w-[440px] mx-auto px-5 pt-10 pb-28 w-full">
-        <div className="text-center mb-8">
-          <div className="text-sm text-[#6b6997] mb-2">Best match</div>
+        <div className="text-center mb-6">
+          <div style={{ fontSize: 12, color: "#9ca3af", marginBottom: 6, fontWeight: 500, textTransform: "uppercase", letterSpacing: "0.07em" }}>Best match</div>
           {winner ? (
             <div
               style={{
-                background: "linear-gradient(160deg,#1a1635,#231d4f)",
+                background: "white",
                 borderRadius: 24,
-                padding: "32px 28px",
-                marginBottom: 24,
-                border: `2px solid ${catColor}44`,
-                boxShadow: `0 0 40px ${catColor}22`,
+                padding: "28px 24px",
+                marginBottom: 20,
+                border: `2px solid ${catColor}30`,
+                boxShadow: `0 8px 32px ${catColor}15`,
               }}
             >
-              <div className="text-8xl mb-4">{winner.emoji}</div>
-              <h1 className="text-3xl font-extrabold text-[#f0eeff] mb-2 tracking-tight">{winner.title}</h1>
-              <p className="text-[#9d9bc7] mb-4">{winner.desc}</p>
+              <div style={{ fontSize: 72, marginBottom: 12 }}>{winner.emoji}</div>
+              <h1 style={{ fontSize: 26, fontWeight: 800, color: "#111827", marginBottom: 6, letterSpacing: "-0.02em" }}>{winner.title}</h1>
+              <p style={{ color: "#6b7280", marginBottom: 14, fontSize: 14 }}>{winner.desc}</p>
               <div className="flex justify-center gap-2 flex-wrap">
                 {winner.tags.map((t) => (
-                  <span
-                    key={t}
-                    style={{
-                      background: `${CAT_COLOR[t] || "#ffffff"}18`,
-                      color: CAT_COLOR[t] || "#9d9bc7",
-                      fontSize: 11,
-                      padding: "3px 10px",
-                      borderRadius: 12,
-                      border: `1px solid ${CAT_COLOR[t] || "#ffffff"}33`,
-                    }}
-                  >
+                  <span key={t} style={{ background: `${CAT_COLOR[t] || "#f3f4f6"}20`, color: CAT_COLOR[t] || "#6b7280", fontSize: 11, padding: "3px 10px", borderRadius: 12, border: `1px solid ${CAT_COLOR[t] || "#e5e7eb"}40` }}>
                     {t}
                   </span>
                 ))}
               </div>
             </div>
           ) : (
-            <p className="text-[#6b6997]">You didn&apos;t like anything — go back and swipe some more!</p>
+            <p style={{ color: "#9ca3af" }}>You didn&apos;t like anything — go back and swipe some more!</p>
           )}
         </div>
 
         {liked.length > 1 && (
-          <div className="mb-6">
-            <div className="text-[#9d9bc7] text-sm mb-3 text-center">Or choose from your {liked.length} liked:</div>
+          <div style={{ marginBottom: 20 }}>
+            <div style={{ color: "#6b7280", fontSize: 13, marginBottom: 10, textAlign: "center" }}>
+              Or choose from your {liked.length} liked:
+            </div>
             <div className="flex flex-wrap gap-2">
               {liked.map((a) => (
-                <div
-                  key={a.id}
-                  style={{ background: "rgba(255,255,255,0.06)", borderRadius: 12, padding: "10px 14px", fontSize: 13, color: "#c4c2e8", display: "flex", gap: 8, alignItems: "center" }}
-                >
-                  <span className="text-xl">{a.emoji}</span>
+                <div key={a.id} style={{ background: "white", borderRadius: 12, padding: "8px 12px", fontSize: 13, color: "#374151", display: "flex", gap: 8, alignItems: "center", border: "1px solid #f3f4f6" }}>
+                  <span style={{ fontSize: 18 }}>{a.emoji}</span>
                   <span>{a.title}</span>
                 </div>
               ))}
@@ -81,27 +70,15 @@ export function ResultScreen({ liked, onRestart, onShowGrid, showGrid, onCloseGr
         )}
 
         <div className="flex flex-col gap-3">
-          <button
-            style={{ background: "linear-gradient(135deg,#6366f1,#8b5cf6)" }}
-            className="w-full py-4 rounded-2xl text-white font-semibold cursor-pointer"
-            onClick={onShowGrid}
-          >
+          <button style={{ width: "100%", padding: "14px", borderRadius: 16, border: "none", background: "linear-gradient(135deg,#6366f1,#8b5cf6)", color: "white", fontWeight: 600, cursor: "pointer", boxShadow: "0 4px 16px rgba(99,102,241,0.25)" }} onClick={onShowGrid}>
             🗂 See all {liked.length} liked
           </button>
           {liked.length > 0 && (
-            <button
-              style={{ background: "rgba(251,191,36,0.15)", color: "#fbbf24", border: "1px solid rgba(251,191,36,0.3)" }}
-              className="w-full py-4 rounded-2xl font-semibold cursor-pointer"
-              onClick={onGroupVote}
-            >
+            <button style={{ width: "100%", padding: "14px", borderRadius: 16, border: "1.5px solid #fde68a", background: "#fffbeb", color: "#92400e", fontWeight: 600, cursor: "pointer" }} onClick={onGroupVote}>
               🗳 Vote on it as a group
             </button>
           )}
-          <button
-            style={{ background: "rgba(255,255,255,0.06)" }}
-            className="w-full py-4 rounded-2xl text-white font-semibold cursor-pointer"
-            onClick={onRestart}
-          >
+          <button style={{ width: "100%", padding: "14px", borderRadius: 16, border: "1.5px solid #e5e7eb", background: "white", color: "#374151", fontWeight: 600, cursor: "pointer" }} onClick={onRestart}>
             Start over
           </button>
         </div>

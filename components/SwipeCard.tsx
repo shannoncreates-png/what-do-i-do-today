@@ -14,6 +14,7 @@ export function SwipeCard({ activity, onSwipe, nextCards }: SwipeCardProps) {
   const [drag, setDrag] = useState({ x: 0, y: 0, dragging: false });
   const [animDir, setAnimDir] = useState<"left" | "right" | null>(null);
   const startRef = useRef<{ x: number; y: number } | null>(null);
+  const dragRef = useRef({ x: 0, y: 0 });
   const velocityRef = useRef<{ x: number; lastX: number; lastT: number }>({ x: 0, lastX: 0, lastT: 0 });
 
   const doSwipe = useCallback(
@@ -22,21 +23,23 @@ export function SwipeCard({ activity, onSwipe, nextCards }: SwipeCardProps) {
       setTimeout(() => {
         onSwipe(dir);
         setDrag({ x: 0, y: 0, dragging: false });
+        dragRef.current = { x: 0, y: 0 };
         setAnimDir(null);
-      }, 250);
+      }, 220);
     },
     [onSwipe]
   );
 
   function onPointerDown(e: React.PointerEvent) {
+    // Capture so drag continues even when pointer leaves the element
+    (e.currentTarget as HTMLElement).setPointerCapture(e.pointerId);
     startRef.current = { x: e.clientX, y: e.clientY };
     velocityRef.current = { x: 0, lastX: e.clientX, lastT: Date.now() };
-    setDrag((d) => ({ ...d, dragging: true }));
-    (e.target as HTMLElement).setPointerCapture(e.pointerId);
+    setDrag({ x: 0, y: 0, dragging: true });
   }
 
   function onPointerMove(e: React.PointerEvent) {
-    if (!drag.dragging || !startRef.current) return;
+    if (!startRef.current) return;
     const now = Date.now();
     const dt = now - velocityRef.current.lastT;
     if (dt > 0) {
@@ -44,152 +47,150 @@ export function SwipeCard({ activity, onSwipe, nextCards }: SwipeCardProps) {
       velocityRef.current.lastX = e.clientX;
       velocityRef.current.lastT = now;
     }
-    setDrag({ x: e.clientX - startRef.current.x, y: e.clientY - startRef.current.y, dragging: true });
+    const x = e.clientX - startRef.current.x;
+    const y = e.clientY - startRef.current.y;
+    dragRef.current = { x, y };
+    setDrag({ x, y, dragging: true });
   }
 
   function onPointerUp() {
-    if (!drag.dragging) return;
+    if (!startRef.current) return;
+    startRef.current = null;
+    const { x } = dragRef.current;
     const velocity = velocityRef.current.x;
-    const absDrag = Math.abs(drag.x);
-    // Velocity-based flick: fast flick (>0.5px/ms) counts even with small drag
-    if (absDrag > 80 || Math.abs(velocity) > 0.5) {
-      doSwipe(drag.x > 0 || velocity > 0 ? "right" : "left");
+    const absDrag = Math.abs(x);
+    if (absDrag > 80 || Math.abs(velocity) > 0.4) {
+      doSwipe(x > 0 || velocity > 0.4 ? "right" : "left");
     } else {
       setDrag({ x: 0, y: 0, dragging: false });
+      dragRef.current = { x: 0, y: 0 };
     }
   }
 
-  const cardRotation = drag.x * 0.08;
-  const cardColor =
-    drag.x > 30
-      ? `rgba(52,211,153,${Math.min(drag.x / 120, 0.5)})`
-      : drag.x < -30
-      ? `rgba(239,68,68,${Math.min(-drag.x / 120, 0.5)})`
-      : "transparent";
+  const cardRotation = drag.x * 0.07;
+  const likeFrac = Math.min(Math.abs(drag.x) / 100, 1);
+  const isRight = drag.x > 20;
+  const isLeft = drag.x < -20;
+  const cardOverlay = isRight
+    ? `rgba(52,211,153,${likeFrac * 0.45})`
+    : isLeft
+    ? `rgba(239,68,68,${likeFrac * 0.45})`
+    : "transparent";
 
   const primaryCat = activity.tags[0];
   const catColor = CAT_COLOR[primaryCat] || "#6366f1";
 
-  let transform = `translateX(${drag.x}px) translateY(${drag.y * 0.3}px) rotate(${cardRotation}deg)`;
-  let transition = drag.dragging ? "none" : "transform 0.35s cubic-bezier(0.34,1.56,0.64,1)";
+  let transform = `translateX(${drag.x}px) translateY(${drag.y * 0.25}px) rotate(${cardRotation}deg)`;
+  let transition = drag.dragging ? "none" : "transform 0.28s ease-out";
   if (animDir === "right") {
-    transform = "translateX(200%) rotate(20deg)";
-    transition = "transform 0.25s ease-in";
+    transform = "translateX(130vw) rotate(22deg)";
+    transition = "transform 0.22s ease-in";
   } else if (animDir === "left") {
-    transform = "translateX(-200%) rotate(-20deg)";
-    transition = "transform 0.25s ease-in";
+    transform = "translateX(-130vw) rotate(-22deg)";
+    transition = "transform 0.22s ease-in";
   }
 
   return (
-    <div className="relative flex items-center justify-center w-full" style={{ minHeight: 460 }}>
-      {/* Ghost cards */}
+    <div className="relative w-full" style={{ maxWidth: 380 }}>
+      {/* Ghost cards behind */}
       {nextCards
         .slice()
         .reverse()
         .map((card, i) => {
-          const offset = (nextCards.length - i) * 10;
-          const scale = 1 - (nextCards.length - i) * 0.05;
+          const idx = nextCards.length - i;
           return (
             <div
               key={card.id}
               style={{
                 position: "absolute",
-                width: "100%",
-                maxWidth: 360,
-                transform: `translateY(${offset}px) scale(${scale})`,
-                zIndex: i,
+                inset: 0,
                 borderRadius: 24,
-                height: 480,
-                background: "linear-gradient(160deg,#1a1635,#231d4f)",
-                boxShadow: "0 8px 32px rgba(0,0,0,0.4)",
-                opacity: 0.6,
+                background: "white",
+                boxShadow: "0 4px 20px rgba(0,0,0,0.08)",
+                transform: `translateY(${idx * 8}px) scale(${1 - idx * 0.04})`,
+                zIndex: i,
+                opacity: 1 - idx * 0.15,
               }}
             />
           );
         })}
 
-      {/* Main card */}
+      {/* Main swipeable card */}
       <div
         onPointerDown={onPointerDown}
         onPointerMove={onPointerMove}
         onPointerUp={onPointerUp}
-        onPointerLeave={onPointerUp}
+        onPointerCancel={onPointerUp}
         style={{
           position: "relative",
-          width: "100%",
-          maxWidth: 360,
           zIndex: 10,
           borderRadius: 24,
           overflow: "hidden",
-          background: "linear-gradient(160deg,#1a1635,#231d4f)",
-          boxShadow: `0 20px 60px rgba(0,0,0,0.6), 0 0 0 1px ${catColor}33`,
+          background: "white",
+          boxShadow: drag.dragging
+            ? "0 24px 64px rgba(0,0,0,0.18)"
+            : "0 8px 32px rgba(0,0,0,0.1)",
+          border: `1.5px solid ${catColor}28`,
           transform,
           transition,
           cursor: drag.dragging ? "grabbing" : "grab",
           userSelect: "none",
           touchAction: "none",
-          minHeight: 460,
+          willChange: "transform",
         }}
       >
-        {/* Entrance animation */}
-        <style>{`
-          @keyframes cardIn {
-            from { opacity: 0; transform: scale(0.92) translateY(16px); }
-            to   { opacity: 1; transform: scale(1) translateY(0); }
-          }
-        `}</style>
-
-        {/* Color wash overlay */}
+        {/* Color wash */}
         <div
           style={{
             position: "absolute",
             inset: 0,
             zIndex: 2,
-            borderRadius: 24,
-            background: cardColor,
-            transition: drag.dragging ? "none" : "background 0.2s",
+            background: cardOverlay,
             pointerEvents: "none",
+            borderRadius: 24,
           }}
         />
 
-        {/* YES / NOPE labels */}
-        {drag.x > 30 && (
+        {/* YES / NOPE stamps */}
+        {isRight && (
           <div
             style={{
               position: "absolute",
-              top: 28,
-              left: 24,
+              top: 24,
+              left: 20,
               zIndex: 5,
-              background: "rgba(52,211,153,0.2)",
-              border: "2px solid #34d399",
+              background: "rgba(52,211,153,0.15)",
+              border: "2.5px solid #34d399",
               borderRadius: 8,
-              padding: "4px 12px",
-              transform: "rotate(-12deg)",
-              fontSize: 22,
+              padding: "3px 10px",
+              transform: "rotate(-14deg)",
+              fontSize: 18,
               fontWeight: 800,
-              color: "#34d399",
+              color: "#059669",
               letterSpacing: 2,
+              opacity: likeFrac,
             }}
           >
             YES
           </div>
         )}
-        {drag.x < -30 && (
+        {isLeft && (
           <div
             style={{
               position: "absolute",
-              top: 28,
-              right: 24,
+              top: 24,
+              right: 20,
               zIndex: 5,
-              background: "rgba(239,68,68,0.2)",
-              border: "2px solid #ef4444",
+              background: "rgba(239,68,68,0.12)",
+              border: "2.5px solid #ef4444",
               borderRadius: 8,
-              padding: "4px 12px",
-              transform: "rotate(12deg)",
-              fontSize: 22,
+              padding: "3px 10px",
+              transform: "rotate(14deg)",
+              fontSize: 18,
               fontWeight: 800,
-              color: "#ef4444",
+              color: "#dc2626",
               letterSpacing: 2,
+              opacity: likeFrac,
             }}
           >
             NOPE
@@ -197,52 +198,51 @@ export function SwipeCard({ activity, onSwipe, nextCards }: SwipeCardProps) {
         )}
 
         {/* Card content */}
-        <div style={{ padding: "32px 28px 28px", position: "relative", zIndex: 3 }}>
-          {/* Category badge */}
-          <div className="flex justify-between items-center mb-6">
+        <div style={{ padding: "24px 24px 20px", position: "relative", zIndex: 3 }}>
+          {/* Category + effort row */}
+          <div className="flex justify-between items-center mb-4">
             <span
               style={{
-                background: `${catColor}22`,
+                background: `${catColor}18`,
                 color: catColor,
                 fontSize: 11,
-                fontWeight: 600,
+                fontWeight: 700,
                 padding: "4px 10px",
                 borderRadius: 20,
-                border: `1px solid ${catColor}44`,
+                border: `1px solid ${catColor}30`,
                 textTransform: "uppercase",
-                letterSpacing: "0.08em",
+                letterSpacing: "0.07em",
               }}
             >
               {CAT_EMOJI[primaryCat]} {primaryCat}
             </span>
-            <span className="text-[#4b4a6e] text-xs">{EFFORT_LABEL[activity.effort]}</span>
+            <span style={{ fontSize: 11, color: "#9ca3af", fontWeight: 500 }}>{EFFORT_LABEL[activity.effort]}</span>
           </div>
 
           {/* Emoji */}
-          <div className="text-7xl leading-none mb-5" style={{ filter: "drop-shadow(0 4px 12px rgba(0,0,0,0.4))" }}>
-            {activity.emoji}
-          </div>
+          <div className="text-6xl leading-none mb-3">{activity.emoji}</div>
 
           {/* Title */}
-          <h2 className="text-3xl font-extrabold text-[#f0eeff] mb-2.5 leading-tight tracking-tight">
+          <h2 style={{ fontSize: 24, fontWeight: 800, color: "#111827", marginBottom: 6, lineHeight: 1.2, letterSpacing: "-0.02em" }}>
             {activity.title}
           </h2>
 
           {/* Description */}
-          <p className="text-[#9d9bc7] text-[15px] leading-relaxed mb-6">{activity.desc}</p>
+          <p style={{ color: "#6b7280", fontSize: 14, lineHeight: 1.55, marginBottom: 16 }}>{activity.desc}</p>
 
           {/* Tags */}
-          <div className="flex flex-wrap gap-1.5 mb-5">
+          <div className="flex flex-wrap gap-1.5 mb-4">
             {activity.tags.map((tag) => (
               <span
                 key={tag}
                 style={{
-                  background: `${CAT_COLOR[tag] || "rgba(255,255,255,0.1)"}18`,
-                  color: CAT_COLOR[tag] || "#9d9bc7",
+                  background: `${CAT_COLOR[tag] || "#f3f4f6"}20`,
+                  color: CAT_COLOR[tag] || "#6b7280",
                   fontSize: 11,
                   padding: "3px 8px",
-                  borderRadius: 12,
-                  border: `1px solid ${CAT_COLOR[tag] || "rgba(255,255,255,0.1)"}33`,
+                  borderRadius: 10,
+                  border: `1px solid ${CAT_COLOR[tag] || "#e5e7eb"}40`,
+                  fontWeight: 500,
                 }}
               >
                 {tag}
@@ -251,48 +251,16 @@ export function SwipeCard({ activity, onSwipe, nextCards }: SwipeCardProps) {
           </div>
 
           {/* Meta */}
-          <div className="flex gap-3 flex-wrap">
-            <span
-              style={{
-                fontSize: 11,
-                color: "#6b6997",
-                background: "rgba(255,255,255,0.05)",
-                padding: "4px 8px",
-                borderRadius: 8,
-              }}
-            >
+          <div className="flex gap-2 flex-wrap">
+            <span style={{ fontSize: 11, color: "#9ca3af", background: "#f9fafb", padding: "4px 8px", borderRadius: 8, border: "1px solid #f3f4f6" }}>
               💰 {BUDGET_LABEL[activity.budget]}
             </span>
-            <span
-              style={{
-                fontSize: 11,
-                color: "#6b6997",
-                background: "rgba(255,255,255,0.05)",
-                padding: "4px 8px",
-                borderRadius: 8,
-              }}
-            >
-              {activity.solo && activity.date
-                ? "👤👫 Solo or together"
-                : activity.solo
-                ? "👤 Solo"
-                : "👫 Better together"}
+            <span style={{ fontSize: 11, color: "#9ca3af", background: "#f9fafb", padding: "4px 8px", borderRadius: 8, border: "1px solid #f3f4f6" }}>
+              {activity.solo && activity.date ? "👤👫 Solo or together" : activity.solo ? "👤 Solo" : "👫 Together"}
             </span>
           </div>
         </div>
       </div>
-
-      {/* Tap-to-swipe buttons (invisible overlay, accessible) */}
-      <button
-        aria-label="Skip"
-        style={{ position: "absolute", left: 0, top: 0, bottom: 0, width: "30%", opacity: 0, zIndex: 20 }}
-        onClick={() => doSwipe("left")}
-      />
-      <button
-        aria-label="Like"
-        style={{ position: "absolute", right: 0, top: 0, bottom: 0, width: "30%", opacity: 0, zIndex: 20 }}
-        onClick={() => doSwipe("right")}
-      />
     </div>
   );
 }

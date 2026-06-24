@@ -1,6 +1,5 @@
 "use client";
 
-import { useState } from "react";
 import { SwipeCard } from "./SwipeCard";
 import { GridModal } from "./GridModal";
 import { pickNext } from "@/lib/algorithm";
@@ -28,9 +27,7 @@ interface SwipeScreenProps {
 
 export function SwipeScreen({ swipeState, onUpdate, onSelect, onShowGrid, showGrid, onCloseGrid }: SwipeScreenProps) {
   const { pool, current, liked, swipeCount, tagScores, dislikedTags, recentCategories, seenIds } = swipeState;
-  const [likedTray, setLikedTray] = useState(false);
 
-  // Build 2-card preview stack
   const nextCards: Activity[] = [];
   {
     const seenSet = new Set(Array.isArray(seenIds) ? seenIds : [...(seenIds as unknown as Set<number>)]);
@@ -83,102 +80,116 @@ export function SwipeScreen({ swipeState, onUpdate, onSelect, onShowGrid, showGr
   }
 
   const phase = swipeCount < 10 ? 1 : swipeCount < 20 ? 2 : 3;
-  const phaseDesc =
-    phase === 1
-      ? "Exploring all 12 categories to understand your vibe"
-      : phase === 2
-      ? "Mixing variety with what you're responding to"
-      : "Dialling in — serving what you love, filtering what you don't";
 
   return (
-    <div className="min-h-screen bg-[#0b0818] text-[#f0eeff] flex flex-col">
-      {/* Header */}
-      <div className="flex items-center justify-between px-5 pt-4 max-w-[440px] mx-auto w-full">
-        <div className="text-xs text-[#6b6997]">{swipeCount} swipes</div>
-        <div className="text-xs text-[#6b6997]">Phase {phase}</div>
+    // h-dvh prevents scroll; overflow-hidden clips ghost cards
+    <div
+      className="flex flex-col overflow-hidden"
+      style={{ height: "100dvh", background: "#f7f5ff" }}
+    >
+      {/* Header — compact */}
+      <div className="flex items-center justify-between px-5 pt-4 pb-2 max-w-[440px] mx-auto w-full flex-shrink-0">
+        <span style={{ fontSize: 12, color: "#a0a0c0", fontWeight: 500 }}>{swipeCount} swipes · phase {phase}</span>
         <button
-          style={{ background: "rgba(255,255,255,0.08)", border: "none", borderRadius: 20, color: "#f0eeff", padding: "6px 14px", fontSize: 14, cursor: "pointer", fontWeight: 600 }}
           onClick={onShowGrid}
+          style={{
+            background: liked.length > 0 ? "#ede9fe" : "#f3f4f6",
+            border: "none",
+            borderRadius: 20,
+            color: liked.length > 0 ? "#7c3aed" : "#9ca3af",
+            padding: "6px 14px",
+            fontSize: 13,
+            cursor: "pointer",
+            fontWeight: 600,
+            transition: "all 0.15s",
+          }}
         >
           ❤️ {liked.length}
         </button>
       </div>
 
-      {/* Algorithm hint */}
-      <div className="max-w-[440px] mx-auto mt-2 px-5 w-full">
-        <div
-          style={{ background: "rgba(99,102,241,0.12)", borderRadius: 10, border: "1px solid rgba(99,102,241,0.2)" }}
-          className="px-3 py-2 text-[11px] text-[#9d9bc7] text-center"
-        >
-          🤖 {phaseDesc}
-        </div>
-      </div>
-
-      {/* Card area */}
-      <div className="flex-1 flex items-center justify-center px-5 py-5">
+      {/* Card area — flex-1 centers the card */}
+      <div className="flex-1 flex items-center justify-center px-5 min-h-0">
         {current ? (
           <SwipeCard activity={current} onSwipe={handleSwipe} nextCards={nextCards} />
         ) : (
-          <div className="text-center text-[#6b6997]">
+          <div className="text-center" style={{ color: "#9ca3af" }}>
             <div className="text-5xl mb-3">🎉</div>
             <p>You&apos;ve seen everything!</p>
           </div>
         )}
       </div>
 
-      {/* Action buttons */}
-      <div className="px-5 pb-4 max-w-[440px] mx-auto w-full">
-        <div className="flex gap-4 justify-center items-center mb-4">
+      {/* Action buttons — fixed at bottom, no scroll needed */}
+      <div className="flex-shrink-0 px-5 pb-6 pt-3 max-w-[440px] mx-auto w-full">
+        <div className="flex gap-3 items-center">
+          {/* Skip */}
           <button
-            style={{ width: 60, height: 60, borderRadius: "50%", background: "rgba(239,68,68,0.15)", border: "2px solid rgba(239,68,68,0.27)", color: "#ef4444", fontSize: 28, cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center" }}
             onClick={() => handleSwipe("left")}
             title="Skip"
+            style={{
+              width: 52,
+              height: 52,
+              borderRadius: "50%",
+              background: "white",
+              border: "1.5px solid #fca5a5",
+              color: "#ef4444",
+              fontSize: 22,
+              cursor: "pointer",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              boxShadow: "0 2px 8px rgba(239,68,68,0.12)",
+              flexShrink: 0,
+            }}
           >
-            ✗
+            ✕
           </button>
 
+          {/* Choose */}
           <button
-            style={{ flex: 1, padding: "14px 16px", borderRadius: 16, border: "none", background: "linear-gradient(135deg,#6366f1,#8b5cf6)", color: "white", fontSize: 14, fontWeight: 600, cursor: liked.length === 0 ? "not-allowed" : "pointer", opacity: liked.length === 0 ? 0.4 : 1 }}
             onClick={onSelect}
             disabled={liked.length === 0}
+            style={{
+              flex: 1,
+              padding: "13px 16px",
+              borderRadius: 16,
+              border: "none",
+              background: liked.length === 0 ? "#e5e7eb" : "linear-gradient(135deg,#6366f1,#8b5cf6)",
+              color: liked.length === 0 ? "#9ca3af" : "white",
+              fontSize: 14,
+              fontWeight: 600,
+              cursor: liked.length === 0 ? "not-allowed" : "pointer",
+              transition: "all 0.15s",
+              boxShadow: liked.length > 0 ? "0 4px 16px rgba(99,102,241,0.3)" : "none",
+            }}
           >
-            {liked.length === 0 ? "Like something first" : `Choose from ${liked.length} liked`}
+            {liked.length === 0 ? "Like something first" : `Choose from ${liked.length} liked ✨`}
           </button>
 
+          {/* Like */}
           <button
-            style={{ width: 60, height: 60, borderRadius: "50%", background: "rgba(52,211,153,0.15)", border: "2px solid rgba(52,211,153,0.27)", color: "#34d399", fontSize: 28, cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center" }}
             onClick={() => handleSwipe("right")}
             title="Like"
+            style={{
+              width: 52,
+              height: 52,
+              borderRadius: "50%",
+              background: "white",
+              border: "1.5px solid #6ee7b7",
+              color: "#10b981",
+              fontSize: 22,
+              cursor: "pointer",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              boxShadow: "0 2px 8px rgba(52,211,153,0.15)",
+              flexShrink: 0,
+            }}
           >
             ♥
           </button>
         </div>
-
-        {/* Liked tray */}
-        {liked.length > 0 && (
-          <div>
-            <button
-              style={{ background: "none", border: "none", color: "#6b6997", fontSize: 12, cursor: "pointer", display: "flex", alignItems: "center", gap: 6, margin: "0 auto" }}
-              onClick={() => setLikedTray((t) => !t)}
-            >
-              {likedTray ? "▲" : "▼"} {liked.length} liked so far
-            </button>
-            {likedTray && (
-              <div className="mt-2.5 flex gap-2 flex-wrap justify-center">
-                {liked.slice(-8).map((a) => (
-                  <div
-                    key={a.id}
-                    style={{ background: "rgba(255,255,255,0.06)", borderRadius: 10, padding: "6px 10px", fontSize: 12, color: "#c4c2e8", display: "flex", gap: 6, alignItems: "center" }}
-                  >
-                    <span>{a.emoji}</span>
-                    <span style={{ maxWidth: 90, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{a.title}</span>
-                  </div>
-                ))}
-                {liked.length > 8 && <span style={{ color: "#6b6997", fontSize: 12, alignSelf: "center" }}>+{liked.length - 8} more</span>}
-              </div>
-            )}
-          </div>
-        )}
       </div>
     </div>
   );

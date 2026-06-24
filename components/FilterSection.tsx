@@ -6,10 +6,10 @@ interface FilterSectionProps {
 
 export function FilterSection({ label, hint, children }: FilterSectionProps) {
   return (
-    <div className="mb-7">
-      <div className="flex items-baseline gap-2 mb-2.5">
-        <span className="text-[#e2e0ff] font-semibold text-xs uppercase tracking-widest">{label}</span>
-        {hint && <span className="text-[#6b6997] text-[11px]">{hint}</span>}
+    <div style={{ marginBottom: 24 }}>
+      <div style={{ display: "flex", alignItems: "baseline", gap: 8, marginBottom: 10 }}>
+        <span style={{ color: "#374151", fontWeight: 700, fontSize: 12, textTransform: "uppercase", letterSpacing: "0.07em" }}>{label}</span>
+        {hint && <span style={{ color: "#9ca3af", fontSize: 11 }}>{hint}</span>}
       </div>
       {children}
     </div>

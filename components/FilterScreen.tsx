@@ -55,25 +55,34 @@ export function FilterScreen({ onStart }: FilterScreenProps) {
   const count = buildPool(ALL_ACTIVITIES, sel).length;
 
   return (
-    <div className="min-h-screen bg-[#0b0818] text-[#f0eeff] flex flex-col">
+    <div style={{ background: "#f7f5ff", minHeight: "100dvh", color: "#111827" }}>
       <div className="max-w-[440px] mx-auto px-5 pt-10 pb-16 w-full">
         {/* Header */}
         <div className="text-center mb-7">
           <div className="text-5xl mb-3">✨</div>
-          <h1 className="text-3xl font-extrabold text-[#f0eeff] mb-2 tracking-tight">What do I do today?</h1>
-          <p className="text-[#9d9bc7] text-sm leading-relaxed max-w-xs mx-auto">
-            Swipe through 1,239 ideas across 12 categories. The more you swipe, the smarter it gets — liking and
-            skipping teaches it exactly what you&apos;re in the mood for.
+          <h1 style={{ fontSize: 28, fontWeight: 800, color: "#111827", marginBottom: 8, letterSpacing: "-0.02em" }}>
+            What do I do today?
+          </h1>
+          <p style={{ color: "#6b7280", fontSize: 14, lineHeight: 1.6, maxWidth: 300, margin: "0 auto" }}>
+            Swipe through 1,239 ideas across 12 categories. The more you swipe, the smarter it gets.
           </p>
         </div>
 
         {/* Primary CTA */}
         <button
           style={{
+            width: "100%",
+            padding: "15px",
+            borderRadius: 18,
+            border: "none",
             background: "linear-gradient(135deg,#6366f1,#8b5cf6)",
-            boxShadow: "0 4px 24px rgba(99,102,241,0.4)",
+            color: "white",
+            fontSize: 16,
+            fontWeight: 700,
+            marginBottom: 12,
+            cursor: "pointer",
+            boxShadow: "0 4px 20px rgba(99,102,241,0.35)",
           }}
-          className="w-full py-4 rounded-2xl text-white text-lg font-bold mb-8 cursor-pointer"
           onClick={() => onStart(sel)}
         >
           🎲 Start swiping — {count} activities
@@ -81,8 +90,18 @@ export function FilterScreen({ onStart }: FilterScreenProps) {
 
         {/* Surprise me */}
         <button
-          style={{ background: "rgba(251,191,36,0.12)", border: "1px solid rgba(251,191,36,0.3)", color: "#fbbf24" }}
-          className="w-full py-3 rounded-2xl text-sm font-semibold mb-8 cursor-pointer"
+          style={{
+            width: "100%",
+            padding: "12px",
+            borderRadius: 14,
+            border: "1.5px solid #e9d5ff",
+            background: "#faf5ff",
+            color: "#7c3aed",
+            fontSize: 14,
+            fontWeight: 600,
+            marginBottom: 28,
+            cursor: "pointer",
+          }}
           onClick={surpriseMe}
         >
           🎰 Surprise me — pick one randomly
@@ -90,9 +109,9 @@ export function FilterScreen({ onStart }: FilterScreenProps) {
 
         {/* Divider */}
         <div className="flex items-center gap-3 mb-7">
-          <div className="flex-1 h-px bg-white/8" />
-          <span className="text-[#4b4a6e] text-xs whitespace-nowrap">or filter first</span>
-          <div className="flex-1 h-px bg-white/8" />
+          <div style={{ flex: 1, height: 1, background: "#e5e7eb" }} />
+          <span style={{ color: "#9ca3af", fontSize: 12 }}>or filter first</span>
+          <div style={{ flex: 1, height: 1, background: "#e5e7eb" }} />
         </div>
 
         {/* Filters */}
@@ -109,9 +128,7 @@ export function FilterScreen({ onStart }: FilterScreenProps) {
         <FilterSection label="Budget">
           <div className="flex flex-wrap gap-2">
             {BUDGETS.map(([v, l]) => (
-              <Chip key={v} active={sel.budget.includes(v)} onClick={() => toggle("budget", v)}>
-                {l}
-              </Chip>
+              <Chip key={v} active={sel.budget.includes(v)} onClick={() => toggle("budget", v)}>{l}</Chip>
             ))}
           </div>
         </FilterSection>
@@ -119,9 +136,7 @@ export function FilterScreen({ onStart }: FilterScreenProps) {
         <FilterSection label="Weather today">
           <div className="flex flex-wrap gap-2">
             {WEATHERS.map(([v, l]) => (
-              <Chip key={v} active={sel.weather.includes(v)} onClick={() => toggle("weather", v)}>
-                {l}
-              </Chip>
+              <Chip key={v} active={sel.weather.includes(v)} onClick={() => toggle("weather", v)}>{l}</Chip>
             ))}
           </div>
         </FilterSection>
@@ -129,20 +144,24 @@ export function FilterScreen({ onStart }: FilterScreenProps) {
         <FilterSection label="Vibe">
           <div className="flex flex-wrap gap-2">
             {VIBES.map(([v, l]) => (
-              <Chip key={v} active={sel.vibe.includes(v)} onClick={() => toggle("vibe", v)}>
-                {l}
-              </Chip>
+              <Chip key={v} active={sel.vibe.includes(v)} onClick={() => toggle("vibe", v)}>{l}</Chip>
             ))}
           </div>
         </FilterSection>
 
-        {/* Secondary CTA */}
         <button
           style={{
+            width: "100%",
+            padding: "15px",
+            borderRadius: 18,
+            border: "none",
             background: "linear-gradient(135deg,#6366f1,#8b5cf6)",
-            boxShadow: "0 4px 24px rgba(99,102,241,0.35)",
+            color: "white",
+            fontSize: 16,
+            fontWeight: 700,
+            cursor: "pointer",
+            boxShadow: "0 4px 20px rgba(99,102,241,0.3)",
           }}
-          className="w-full py-4 rounded-2xl text-white text-base font-bold cursor-pointer"
           onClick={() => onStart(sel)}
         >
           🎲 Start swiping — {count} activities

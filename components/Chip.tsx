@@ -13,15 +13,16 @@ export function Chip({ active, color, onClick, children }: ChipProps) {
     <button
       onClick={onClick}
       style={{
-        padding: "8px 14px",
+        padding: "7px 13px",
         borderRadius: 20,
-        border: `1.5px solid ${active ? c : "rgba(255,255,255,0.12)"}`,
-        background: active ? `${c}22` : "rgba(255,255,255,0.04)",
-        color: active ? c : "#9d9bc7",
+        border: `1.5px solid ${active ? c : "#e5e7eb"}`,
+        background: active ? `${c}15` : "white",
+        color: active ? c : "#6b7280",
         fontSize: 13,
         cursor: "pointer",
         fontWeight: active ? 600 : 400,
-        transition: "all 0.15s",
+        transition: "all 0.12s",
+        boxShadow: active ? `0 2px 8px ${c}20` : "none",
       }}
     >
       {children}
