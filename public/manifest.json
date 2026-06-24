@@ -1,0 +1,26 @@
+{
+  "name": "What do I do today?",
+  "short_name": "What today?",
+  "description": "Swipe through 1,239 activity ideas to find the perfect thing to do today.",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#0b0818",
+  "theme_color": "#0b0818",
+  "orientation": "portrait",
+  "icons": [
+    {
+      "src": "/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ],
+  "categories": ["lifestyle", "entertainment"],
+  "screenshots": []
+}

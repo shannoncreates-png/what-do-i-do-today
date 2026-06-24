@@ -1,0 +1,37 @@
+@import "tailwindcss";
+
+:root {
+  --bg: #0b0818;
+  --text: #f0eeff;
+  --muted: #9d9bc7;
+  --faint: #6b6997;
+  --border: rgba(255, 255, 255, 0.1);
+  --accent: #6366f1;
+  --accent2: #8b5cf6;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  background: #0b0818;
+  color: #f0eeff;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  min-height: 100%;
+  overscroll-behavior: none;
+}
+
+input::placeholder {
+  color: #4b4a6e;
+}
+
+input:focus {
+  outline: none;
+}
+
+button:focus-visible {
+  outline: 2px solid #6366f1;
+  outline-offset: 2px;
+}
