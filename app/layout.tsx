@@ -3,6 +3,7 @@ import "./globals.css";
 import { ServiceWorkerRegistrar } from "@/components/ServiceWorkerRegistrar";
 
 export const metadata: Metadata = {
+  metadataBase: new URL("https://what-do-i-do-today.vercel.app"),
   title: {
     default: "What do I do today?",
     template: "%s — What do I do today?",
@@ -25,11 +26,13 @@ export const metadata: Metadata = {
       "Swipe through 1,239 activity ideas. Like what sounds good, skip what doesn't — the algorithm learns your vibe.",
     type: "website",
     siteName: "What do I do today?",
+    images: [{ url: "/opengraph-image", width: 1200, height: 630, alt: "What do I do today? — 1,239 activity ideas" }],
   },
   twitter: {
     card: "summary_large_image",
     title: "What do I do today?",
     description: "Tinder-style activity swipe app. 1,239 ideas, 12 categories, one perfect match.",
+    images: ["/opengraph-image"],
   },
   manifest: "/manifest.json",
   appleWebApp: {

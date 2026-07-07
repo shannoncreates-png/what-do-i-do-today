@@ -1,4 +1,5 @@
 User-agent: *
 Allow: /
+Disallow: /api/
 
 Sitemap: https://what-do-i-do-today.vercel.app/sitemap.xml
